@@ -3,6 +3,7 @@ package org.example.step2;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.*;
+import org.example.step2.visitor.*;
 
 import java.io.*;
 import java.util.*;
@@ -22,6 +23,9 @@ public class Parser {
 
     static Set<String>  myPackageList=new HashSet<>();
     static int nbp=0;
+    static String content2 = null;
+    static CompilationUnit parse2 = null;
+
     public static void main(String[] args) throws IOException {
 
         // read java files
@@ -29,14 +33,13 @@ public class Parser {
         //CompilationUnit parse2=null;
 
         for (File fileEntry : javaFiles) {
-            String content2 = FileUtils.readFileToString(fileEntry);
             // System.out.println(content);
             content.append(FileUtils.readFileToString(fileEntry));
            // content.append("\r");
-
             parse = parse(content.toString().toCharArray());
-            CompilationUnit parse2 = parse(content2.toCharArray());
 
+            content2 = FileUtils.readFileToString(fileEntry);
+            parse2 = parse(content2.toCharArray());
             // print methods info
             //printMethodInfo(parse);
             // print packages info
@@ -50,26 +53,28 @@ public class Parser {
             //print classes info
             //printClassesInfo(parse);
             //nombre de classes
-            //getFileContent(projectSourcePath);
+           // getFileContent(projectSourcePath);
             ClassesAttributes(parse);
             nbp=nbPackages(parse,myPackageList);
+            maxLigneMethodeByClass(parse2);
 
         }
 
 
-        // System.out.println("Le nombre de classes de l'application: " + nbClasses(parse));
-        //System.out.println("Le nombre de lignes de l'application: " + nbLines(parse,content));
-        /*System.out.println("Le nombre de méthodes de l'application: " + nbMethod(parse));
+        /* System.out.println("Le nombre de classes de l'application: " + nbClasses(parse));
+       System.out.println("Le nombre de lignes de l'application: " + nbLines(parse,content));
+        System.out.println("Le nombre de méthodes de l'application: " + numberOfMethods(parse));
         averageMethode(parse);
-        System.out.println("Le nombre moyen de lignes par méthodes: " + averageLinesByMethod(parse));
-        System.out.println("Le nombre moyen d'attributs par classe: " + ClassesAttributes(parse) / nbClasses(parse));
-        classMaxNbMethode(parse);
-        classMaxNbAttributes(parse);
-        bothMaxMethAttrByClass(parse);
-        classWithXmethod(parse, 17);*/
-        //maxLigneMethodeByClass(parse);
+       System.out.println("Le nombre moyen de lignes par méthodes: " + averageLinesByMethod(parse));
+       // System.out.println("Le nombre moyen d'attributs par classe: " + ClassesAttributes(parse) / nbClasses(parse));
+        System.out.println("heeeeeeeeeeeeeeeeeeeeeer");
+        classMaxNbMethode(parse);*/
+        //classMaxNbAttributes(parse);
+       // bothMaxMethAttrByClass(parse);
+        ////System.out.println("heeeeeeeeeeeeeere");
+       // classWithXmethod(parse, 16);
 
-        // maximalParameterOfMethods(parse);
+         //maximalParameterOfMethods(parse2);
         //nbPackages(parse,myPackageList);
 
 
@@ -130,19 +135,14 @@ public class Parser {
 
     }
 
-    public static int nbMethod(CompilationUnit parse) {
-        MethodDeclarationVisitor visitorMethod = new MethodDeclarationVisitor();
-        parse.accept(visitorMethod);
-        //System.out.println("Le nombre de méthodes de l'application est: " + visitorMethod.getNbMethod());
-        return visitorMethod.getNbMethod();
-    }
+
 
     public static void printPackageInfo(CompilationUnit parse) {
         PackageDeclarationVisitor visitor = new PackageDeclarationVisitor();
         parse.accept(visitor);
 
-        for (PackageDeclaration pack : visitor.getPackages()) {
-            System.out.println("Package name: " + pack.getName());
+        for (String pack : visitor.getPackages()) {
+            System.out.println("Package name: " + pack);
             counter += visitor.getPackages().size();
         }
         System.out.println("Package number: " + counter);
@@ -150,22 +150,47 @@ public class Parser {
     }
 
 
+
+    //1. Nombre	de	classes de	l’application.
     public static int nbClasses(CompilationUnit parse) {
         ClassDeclarationVisitor visitorClasses = new ClassDeclarationVisitor();
         parse.accept(visitorClasses);
-        //System.out.println("Le nombre de classes de l'application est: " + visitorClasses.getNbClasses());
-        //counter+=visitorClasses.getClasses().size();
         return visitorClasses.getNbClasses();
     }
 
+
+
+    //2. Nombre	de	lignes	de	code de	l’application.
+    public static int nbLines(CompilationUnit cu,StringBuilder contentOfFiles) {
+        ClassDeclarationVisitor visitorClasses = new ClassDeclarationVisitor();
+        cu.accept(visitorClasses);
+        visitorClasses.setContent(contentOfFiles.toString());
+        //System.out.println(visitorClasses.numberOfLines(content.toString()));
+        return visitorClasses.numberOfLines(contentOfFiles.toString());
+    }
+
+
+    //3. Nombre	total	de	méthodes de	l’application.
+    public static int numberOfMethods(CompilationUnit cu) {
+        ClassDeclarationVisitor visitorClass = new ClassDeclarationVisitor();
+        cu.accept(visitorClass);
+        int nbMéthode=0;
+        for (TypeDeclaration nodeClass : visitorClass.getClasses()) {
+            MethodDeclarationVisitor visitorMethod = new MethodDeclarationVisitor();
+            nodeClass.accept(visitorMethod);
+        nbMéthode+=visitorMethod.getNbMethod();
+        }
+
+        //System.out.println("Le nombre de méthodes de l'application est: " + visitorMethod.getNbMethod());
+        return nbMéthode;
+    }
+
     public static int nbPackages(CompilationUnit parse,Set nbp) {
-        int nbPackage=0;
        // Set<String> nbp =new HashSet<>();
         PackageDeclarationVisitor visitorPackages = new PackageDeclarationVisitor();
         parse.accept(visitorPackages);
-        for (PackageDeclaration packageDeclaration: visitorPackages.getPackages()){
-            nbp.add(String.valueOf(packageDeclaration.getName()));
-
+        for (String packageDeclaration : visitorPackages.getPackages()){
+            nbp.add(packageDeclaration);
         }
 
         return nbp.size();
@@ -221,41 +246,22 @@ public class Parser {
         return sb.toString();
     }
 
-    //nombre de lignes
-    public static int nbLines(CompilationUnit cu,StringBuilder contentOfFiles) {
-        ClassDeclarationVisitor visitorClasses = new ClassDeclarationVisitor();
-        cu.accept(visitorClasses);
-        visitorClasses.setContent(contentOfFiles.toString());
-        //System.out.println(visitorClasses.numberOfLines(content.toString()));
-        return visitorClasses.numberOfLines(contentOfFiles.toString());
-    }
 
 
-    //2. nombre de ligne avec autre methode
+
+
 
 
     //5 nombre moyen de méthode par classe
 
-    public static int averageMethode(CompilationUnit parse) {
-
-        System.out.println("Le nombre moyen de méthode par classe: " + (int) nbMethod(parse) / nbClasses(parse));
-
-        return (int) nbMethod(parse) / nbMethod(parse);
+    public static void averageMethode(CompilationUnit parse) {
+        System.out.println("Le nombre moyen de méthode par classe: " + (int) numberOfMethods(parse) / nbClasses(parse));
     }
 
 
     //question 6: nombre moyen de ligne par méthode
 
-    public static int averageLinesByMethod2(CompilationUnit parse) {
-        int i = 0;
-        MethodDeclarationVisitor visitor = new MethodDeclarationVisitor();
-        parse.accept(visitor);
 
-        for (MethodDeclaration method : visitor.getMethods()) {
-
-        }
-        return i;
-    }
 
     public static int averageLinesByMethod(CompilationUnit parse) {
         MethodDeclarationVisitor visitor = new MethodDeclarationVisitor();
@@ -270,7 +276,7 @@ public class Parser {
             totalLines += lineEnd - lineStart;
         }
 
-        return (int) totalLines / nbMethod(parse);
+        return (int) totalLines / numberOfMethods(parse);
     }
 
     //nombre moyen d'attribut par classe
@@ -460,13 +466,14 @@ public class Parser {
 
             // Obtenir l'iterator pour parcourir la liste
             Iterator itr = set.iterator();
+            //System.out.println("******** myMethodList size: "+myMethodList.size());
             System.out.println("------------nb de methode de la classe " + nodeClass.getName() + ": " + nbMethod+"--------------------");
 
             // Afficher tous les éléments de la liste
             while(itr.hasNext()) {
                 Map.Entry mentry = (Map.Entry)itr.next();
                 System.out.print("Methode: "+mentry.getKey() + " - ");
-                System.out.println("NBLigne: "+mentry.getValue());
+                System.out.println("NBLigne: "+mentry.getValue()+"\n\n\n");
             }
             // Collections.reverse(myMethodList);
            /* System.out.println("les 10% des méthode ayant le plus grand nombre de lignes pour la classe: " + nodeClass.getName());
@@ -532,7 +539,7 @@ public class Parser {
         Set<Map.Entry<String, Integer>> entrySetSortedByValue = sortedByValue.entrySet();
         for (Map.Entry<String, Integer> mapping : entrySetSortedByValue) {
             maliste.add(mapping.getKey());
-            System.out.println(mapping.getKey() + " ==> " + mapping.getValue());
+          //  System.out.println(mapping.getKey() + " ==> " + mapping.getValue());
         }
 
         return maliste;
