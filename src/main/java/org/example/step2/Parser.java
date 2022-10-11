@@ -34,8 +34,9 @@ public class Parser {
 
         for (File fileEntry : javaFiles) {
             // System.out.println(content);
+
             content.append(FileUtils.readFileToString(fileEntry));
-           // content.append("\r");
+            // content.append("\r");
             parse = parse(content.toString().toCharArray());
 
             content2 = FileUtils.readFileToString(fileEntry);
@@ -53,8 +54,8 @@ public class Parser {
             //print classes info
             //printClassesInfo(parse);
             //nombre de classes
-           // getFileContent(projectSourcePath);
-            ClassesAttributes(parse);
+            // getFileContent(projectSourcePath);
+           // ClassesAttributes(parse);
             nbp=nbPackages(parse,myPackageList);
             maxLigneMethodeByClass(parse2);
 
@@ -70,11 +71,11 @@ public class Parser {
         System.out.println("heeeeeeeeeeeeeeeeeeeeeer");
         classMaxNbMethode(parse);*/
         //classMaxNbAttributes(parse);
-       // bothMaxMethAttrByClass(parse);
+        // bothMaxMethAttrByClass(parse);
         ////System.out.println("heeeeeeeeeeeeeere");
-       // classWithXmethod(parse, 16);
+        // classWithXmethod(parse, 16);
 
-         //maximalParameterOfMethods(parse2);
+        //maximalParameterOfMethods(parse2);
         //nbPackages(parse,myPackageList);
 
 
@@ -108,7 +109,6 @@ public class Parser {
         parser.setKind(ASTParser.K_COMPILATION_UNIT);
 
         parser.setBindingsRecovery(true);
-
         Map options = JavaCore.getOptions();
         parser.setCompilerOptions(options);
 
@@ -178,7 +178,7 @@ public class Parser {
         for (TypeDeclaration nodeClass : visitorClass.getClasses()) {
             MethodDeclarationVisitor visitorMethod = new MethodDeclarationVisitor();
             nodeClass.accept(visitorMethod);
-        nbMéthode+=visitorMethod.getNbMethod();
+            nbMéthode+=visitorMethod.getNbMethod();
         }
 
         //System.out.println("Le nombre de méthodes de l'application est: " + visitorMethod.getNbMethod());
@@ -186,7 +186,7 @@ public class Parser {
     }
 
     public static int nbPackages(CompilationUnit parse,Set nbp) {
-       // Set<String> nbp =new HashSet<>();
+        // Set<String> nbp =new HashSet<>();
         PackageDeclarationVisitor visitorPackages = new PackageDeclarationVisitor();
         parse.accept(visitorPackages);
         for (String packageDeclaration : visitorPackages.getPackages()){
@@ -445,7 +445,7 @@ public class Parser {
         for (TypeDeclaration nodeClass : visitorClass.getClasses()) {
             MethodDeclarationVisitor visitorMethod = new MethodDeclarationVisitor();
             nodeClass.accept(visitorMethod);
-            System.out.println("Classes name: " + nodeClass.getName());
+            //System.out.println("Classes name: " + nodeClass.getName());
             nbMethod = visitorMethod.getMethods().size();
             percent = (int) (nbMethod * 0.1);
             if (percent == 0) {
@@ -539,7 +539,7 @@ public class Parser {
         Set<Map.Entry<String, Integer>> entrySetSortedByValue = sortedByValue.entrySet();
         for (Map.Entry<String, Integer> mapping : entrySetSortedByValue) {
             maliste.add(mapping.getKey());
-          //  System.out.println(mapping.getKey() + " ==> " + mapping.getValue());
+            //  System.out.println(mapping.getKey() + " ==> " + mapping.getValue());
         }
 
         return maliste;

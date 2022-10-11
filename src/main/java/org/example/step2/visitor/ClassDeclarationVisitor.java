@@ -1,76 +1,70 @@
 package org.example.step2.visitor;
 
 import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class ClassDeclarationVisitor extends ASTVisitor {
     private int nbClasses;
+    private CompilationUnit cu;
     private List<TypeDeclaration> classes = new ArrayList<>();
     String content;
     List<FieldDeclaration> attributs = new ArrayList<FieldDeclaration>();
+    private int nbLinesOfCodes=0;
+
     @Override
     public boolean visit(TypeDeclaration node) {
-        if(!node.isInterface()){
+        if (!node.isInterface()) {
             classes.add(node);
-            nbClasses++;}
+            nbClasses++;
+        }
         return super.visit(node);
     }
 
-    public List<TypeDeclaration> getClasses(){
+    public List<TypeDeclaration> getClasses() {
         return classes;
     }
 
-    public int getNbClasses(){
+    public int getNbClasses() {
         return nbClasses;
     }
+
     //EXERCICE 2 Nombre de lignes de code de l’application.
     public int numberOfLines(String s) {
         int rslt = 0;
-        rslt+= countLines(s);
+        rslt += countLines(s);
         //return ("Le nombre de lignes de code de l’application est:"+rslt);
         return rslt;
     }
-    public String getContent(){
+
+    public String getContent() {
         return this.content;
     }
 
     public void setContent(String content) {
+
         this.content = content;
     }
 
-    public int countLines(String str){
+    public int countLines(String str) {
         String[] lines = str.split("\r\n|\r|\n");
-        return  lines.length;
+        return lines.length;
     }
 
     public List<FieldDeclaration> getAttribus() {
+
         return attributs;
     }
 
-    public static String getFileContent(String filePath) throws FileNotFoundException, IOException {
-        BufferedReader br = new BufferedReader(new FileReader(filePath));
-        StringBuilder sb = new StringBuilder();
-        int nbLinesOfCodes = 0;
-        String line = br.readLine();
-        while (line != null) {
-            sb.append(line);
-            sb.append(System.lineSeparator());
-            line = br.readLine();
-            nbLinesOfCodes++;
-        }
-        br.close();
-        System.out.println("number of lines: " + sb.toString());
-        return sb.toString();
+    public void setCu(CompilationUnit cu) {
+        this.cu = cu;
     }
+
 
 }
 

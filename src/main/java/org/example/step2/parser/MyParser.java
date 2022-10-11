@@ -1,79 +1,75 @@
 package org.example.step2.parser;
 
 
-import org.apache.commons.io.FileUtils;
-import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MyParser {
 
-    public static final String projectPath = "C:\\Users\\SCD UM\\Downloads\\Comparateur\\Comparateur";
-    public static final String projectSourcePath = projectPath + "\\src";
-    public  final String jrePath = "C:\\Users\\SCD UM\\Downloads\\Comparateur\\Comparateur";
-    private  int counter;
-    private  int nbLinesOfCodes;
-     final File folder = new File(projectSourcePath);
-     ArrayList<File> javaFiles = listJavaFilesForFolder(folder);
-     StringBuilder content = new StringBuilder();
+    private static int nbLinesOfCodes;
 
-
-
-
-
-
-
-
-    // create AST
-    private  CompilationUnit parse(char[] classSource) {
-        ASTParser parser = ASTParser.newParser(AST.JLS4); // java +1.6
-        parser.setResolveBindings(true);
-        parser.setKind(ASTParser.K_COMPILATION_UNIT);
-
-        parser.setBindingsRecovery(true);
-
-        Map options = JavaCore.getOptions();
-        parser.setCompilerOptions(options);
-
-        parser.setUnitName("");
-
-        String[] sources = {projectSourcePath};
-        String[] classpath = {jrePath};
-
-        parser.setEnvironment(classpath, sources, new String[]{"UTF-8"}, true);
-        parser.setSource(classSource);
-
-        return (CompilationUnit) parser.createAST(null); // create and parse
+    public static int getNbLinesOfCodes() {
+        return MyParser.nbLinesOfCodes;
     }
 
-    // read all java files from specific folder
-    public static ArrayList<File> listJavaFilesForFolder(final File folder) {
-        ArrayList<File> javaFiles = new ArrayList<File>();
-        for (File fileEntry : folder.listFiles()) {
-            if (fileEntry.isDirectory()) {
-                javaFiles.addAll(listJavaFilesForFolder(fileEntry));
-            } else if (fileEntry.getName().contains(".java")) {
-                // System.out.println(fileEntry.getName());
-                javaFiles.add(fileEntry);
+    public static void setNbLinesOfCodes(int nbLinesOfCodes) {
+        MyParser.nbLinesOfCodes = nbLinesOfCodes;
+    }
+
+    public CompilationUnit getCompilationUnit(String filePath) throws FileNotFoundException, IOException {
+        ASTParser parser = ASTParser.newParser(AST.JLS4); // java +1.8
+        char[] fileContent = this.getFileContent(filePath).toCharArray();
+        parser.setSource(fileContent);
+        CompilationUnit cu = (CompilationUnit) parser.createAST(null);
+        return cu;
+    }
+
+    public String getFileContent(String filePath) throws FileNotFoundException, IOException {
+        BufferedReader br = new BufferedReader(new FileReader(filePath));
+        StringBuilder sb = new StringBuilder();
+        String line = br.readLine();
+        while (line != null) {
+            sb.append(line);
+            sb.append(System.lineSeparator());
+            line = br.readLine();
+            MyParser.nbLinesOfCodes++;
+        }
+        br.close();
+        return sb.toString();
+    }
+
+    public List<String> getFilesPaths(File directory) {
+
+        List<String> filesPaths = new ArrayList<>();
+
+        for (File file : directory.listFiles()) {
+            if (!file.isDirectory()) {
+                if (this.isJavaFile(file)) {
+                    filesPaths.add(file.getAbsolutePath());
+                }
+            } else {
+                filesPaths.addAll(getFilesPaths(file));
             }
         }
-        return javaFiles;
+        return filesPaths;
     }
 
-    public void getParsedFiles(ArrayList<File> javaFiles,CompilationUnit parse ) throws IOException {
-        javaFiles = listJavaFilesForFolder(folder);
-        for (File fileEntry : javaFiles) {
-            String content = FileUtils.readFileToString(fileEntry);
-            //content.append(FileUtils.readFileToString(fileEntry));
-            parse = parse(content.toString().toCharArray());
+    private boolean isJavaFile(File file) {
 
-        }
+        final String extentionWanted = ".java";
+        int extentionIndex = file.getName().length() - 5;
+        int endFileIndex = file.getName().length();
+        final String fileExtention = file.getName().substring(extentionIndex, endFileIndex);
 
+        return fileExtention.equals(extentionWanted);
     }
+
+
+
 }
 
