@@ -1,6 +1,7 @@
 package org.example.step2.visitor;
 
 import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 
 import java.util.ArrayList;
@@ -9,6 +10,17 @@ import java.util.List;
 public class MethodDeclarationVisitor extends ASTVisitor {
 	List<MethodDeclaration> methods = new ArrayList<MethodDeclaration>();
 	int nbMethod=0;
+
+	public CompilationUnit getCu() {
+		return cu;
+	}
+
+	public void setCu(CompilationUnit cu) {
+		this.cu = cu;
+	}
+
+	private CompilationUnit cu;
+
 	private String contentMethod;
 
 	public boolean visit(MethodDeclaration node) {

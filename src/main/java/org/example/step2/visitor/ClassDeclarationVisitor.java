@@ -1,15 +1,19 @@
 package org.example.step2.visitor;
 
-import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class ClassDeclarationVisitor extends ASTVisitor {
+public class ClassDeclarationVisitor extends Visitor {
     private int nbClasses;
     private CompilationUnit cu;
     private List<TypeDeclaration> classes = new ArrayList<>();
@@ -22,6 +26,12 @@ public class ClassDeclarationVisitor extends ASTVisitor {
         if (!node.isInterface()) {
             classes.add(node);
             nbClasses++;
+            List<MethodDeclaration> methodDeclarations =new ArrayList<>();
+            MethodDeclarationVisitor visitorMethod = new MethodDeclarationVisitor();
+            node.accept(visitorMethod);
+            methodDeclarations= List.of(node.getMethods());
+          //  for (47)
+
         }
         return super.visit(node);
     }
@@ -61,10 +71,23 @@ public class ClassDeclarationVisitor extends ASTVisitor {
         return attributs;
     }
 
-    public void setCu(CompilationUnit cu) {
-        this.cu = cu;
-    }
+    public static void setCu(CompilationUnit cu) {
 
+       cu = cu;
+    }
+    public String getFileContent(String filePath) throws FileNotFoundException, IOException {
+        BufferedReader br = new BufferedReader(new FileReader(filePath));
+        StringBuilder sb = new StringBuilder();
+        String line = br.readLine();
+        while (line != null) {
+            sb.append(line);
+            sb.append(System.lineSeparator());
+            line = br.readLine();
+            //MyParser.nbLinesOfCodes++;
+        }
+        br.close();
+        return sb.toString();
+    }
 
 }
 

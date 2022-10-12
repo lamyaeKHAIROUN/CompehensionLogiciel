@@ -20,9 +20,11 @@ public class Main {
         Scanner sc = new Scanner(System.in);
         int choice = 0;
         Processor processor;
-        processor = new Processor("C:\\Users\\SCD UM\\Downloads\\Comparateur\\Comparateur\\src");
-        processor.parse();
-
+        processor = new Processor("C:\\Users\\SCD UM\\Downloads\\mini_project_in_project\\project\\src");
+       // processor.parseClasses();
+        processor.parsePackages();
+    //1
+        // processor.parseV();
 
         while (true) {
             System.out.println(
@@ -36,7 +38,7 @@ public class Main {
 
             switch (choice) {
             case 1: {
-                processor.display();
+                processor.infoApplication();
                 break;
             }
             default:

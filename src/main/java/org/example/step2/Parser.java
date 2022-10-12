@@ -34,7 +34,6 @@ public class Parser {
 
         for (File fileEntry : javaFiles) {
             // System.out.println(content);
-
             content.append(FileUtils.readFileToString(fileEntry));
             // content.append("\r");
             parse = parse(content.toString().toCharArray());
@@ -55,18 +54,18 @@ public class Parser {
             //printClassesInfo(parse);
             //nombre de classes
             // getFileContent(projectSourcePath);
-           // ClassesAttributes(parse);
+            ClassesAttributes(parse);
             nbp=nbPackages(parse,myPackageList);
             maxLigneMethodeByClass(parse2);
 
         }
 
 
-        /* System.out.println("Le nombre de classes de l'application: " + nbClasses(parse));
-       System.out.println("Le nombre de lignes de l'application: " + nbLines(parse,content));
+        // System.out.println("Le nombre de classes de l'application: " + nbClasses(parse));
+       //System.out.println("Le nombre de lignes de l'application: " + nbLines(parse,content));
         System.out.println("Le nombre de méthodes de l'application: " + numberOfMethods(parse));
         averageMethode(parse);
-       System.out.println("Le nombre moyen de lignes par méthodes: " + averageLinesByMethod(parse));
+      /* System.out.println("Le nombre moyen de lignes par méthodes: " + averageLinesByMethod(parse));
        // System.out.println("Le nombre moyen d'attributs par classe: " + ClassesAttributes(parse) / nbClasses(parse));
         System.out.println("heeeeeeeeeeeeeeeeeeeeeer");
         classMaxNbMethode(parse);*/
@@ -109,6 +108,7 @@ public class Parser {
         parser.setKind(ASTParser.K_COMPILATION_UNIT);
 
         parser.setBindingsRecovery(true);
+
         Map options = JavaCore.getOptions();
         parser.setCompilerOptions(options);
 
