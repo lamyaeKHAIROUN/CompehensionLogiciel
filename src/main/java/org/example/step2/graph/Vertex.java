@@ -20,7 +20,7 @@ public class Vertex {
     }
 
     List<Vertex> listAdj;
-    Vertex(String label) {
+    public Vertex(String label) {
         this.label = label;
         listAdj=new ArrayList<>();
     }

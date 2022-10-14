@@ -1,9 +1,6 @@
 package org.example.step2.processor;
 
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
-import org.eclipse.jdt.core.dom.MethodInvocation;
-import org.eclipse.jdt.core.dom.TypeDeclaration;
+import org.eclipse.jdt.core.dom.*;
 import org.example.step2.Main;
 import org.example.step2.graph.Graph;
 import org.example.step2.graph.Vertex;
@@ -70,7 +67,6 @@ public class Processor {
             List<String> ls = listSort((HashMap<String, Integer>) mapMethod);
             Collections.reverse(ls);
             if(ls.size()==0){
-
                // System.out.println( "Cette classe n'a pas de méthode\n");
                 str="Cette classe n'a pas de méthode\n";
             } else {
@@ -642,21 +638,27 @@ public class Processor {
                 for (MethodInvocation methodInvocation : visitor2.getMethods()) {
                    /* System.out.println("method " + method.getName() + " invoc method "
                             + methodInvocation.getName());*/
-                    String type=" type invoc";
+                    Expression expression = methodInvocation.getExpression();
+                    // extract the type of call
+                    ITypeBinding typeBinding = expression.resolveTypeBinding();
+                    String type = typeBinding == null ? "null" : typeBinding.getName();
+                    System.out.println("type: "+type);
                     target=new Vertex(String.valueOf(methodInvocation.getName()),type);
                     g.addEdge(source,target);
-
 
                 }
 
             }
 
+
         }
 
-        System.out.println("Graph:\n"
+        System.out.println("\nGraph d'appel:\n"
                 +g.toString());
 
         return g;
     }
+
+    //afficher graphe avec JgraphT
 
 }
