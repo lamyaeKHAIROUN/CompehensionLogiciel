@@ -617,44 +617,42 @@ public class Processor {
         for (String fileContent : filesContent) {
             parse = parser.getCompilationUnit(fileContent);
             parse.accept(visitor);
-        }
-        Map<TypeDeclaration, Set<MethodDeclaration>> classContent = new HashMap<>(visitor.getClasseMapMethods());
-        Set set = classContent.entrySet();
 
-        Iterator itr = set.iterator();
-        Set<MethodDeclaration> mapMethod = new HashSet<>();
-        while (itr.hasNext()) {
-            Map.Entry mentry = (Map.Entry) itr.next();
-            //la classe en question
-            TypeDeclaration typeDeclaration = (TypeDeclaration) mentry.getKey();
-            //get la liste de methodes
-            mapMethod = (Set<MethodDeclaration>) mentry.getValue();
+            Map<TypeDeclaration, Set<MethodDeclaration>> classContent = new HashMap<>(visitor.getClasseMapMethods());
+            Set set = classContent.entrySet();
+
+            Iterator itr = set.iterator();
+            Set<MethodDeclaration> mapMethod = new HashSet<>();
+            while (itr.hasNext()) {
+                Map.Entry mentry = (Map.Entry) itr.next();
+                //la classe en question
+                TypeDeclaration typeDeclaration = (TypeDeclaration) mentry.getKey();
+                //get la liste de methodes
+                mapMethod = (Set<MethodDeclaration>) mentry.getValue();
 
 
-            for (MethodDeclaration method : mapMethod) {
-                MethodInvocationVisitor visitor2 = new MethodInvocationVisitor();
-                method.accept(visitor2);
-                source=new Vertex(String.valueOf(method.getName()),String.valueOf(typeDeclaration.getName()));
-                for (MethodInvocation methodInvocation : visitor2.getMethods()) {
-                   /* System.out.println("method " + method.getName() + " invoc method "
-                            + methodInvocation.getName());*/
-                    Expression expression = methodInvocation.getExpression();
-                    // extract the type of call
-                    ITypeBinding typeBinding = expression.resolveTypeBinding();
-                    String type = typeBinding == null ? "null" : typeBinding.getName();
-                    System.out.println("type: "+type);
-                    target=new Vertex(String.valueOf(methodInvocation.getName()),type);
-                    g.addEdge(source,target);
+                for (MethodDeclaration method : mapMethod) {
+                    MethodInvocationVisitor visitor2 = new MethodInvocationVisitor();
+                    method.accept(visitor2);
+                    source = new Vertex(String.valueOf(method.getName()), String.valueOf(typeDeclaration.getName()));
+                    for (MethodInvocation methodInvocation : visitor2.getMethods()) {
+                       /* System.out.println("method " + method.getName() + " invoc method "
+                                + methodInvocation.getName());*/
+                        Expression expression = methodInvocation.getExpression();
+                        // extract the type of call
+                        ITypeBinding typeBinding = expression.resolveTypeBinding();
+                        String type = typeBinding == null ? "null" : typeBinding.getName();
+                        //System.out.println("type: " + type);
+                        target = new Vertex(String.valueOf(methodInvocation.getName()), type);
+                        g.addEdge(source.getLabel(), target.getLabel());
+
+                    }
 
                 }
-
             }
-
-
         }
-
         System.out.println("\nGraph d'appel:\n"
-                +g.toString());
+                +g.afficherGraph());
 
         return g;
     }

@@ -3,12 +3,18 @@ package org.example.step2.visitor;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.MethodInvocation;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class MethodDeclarationVisitor extends ASTVisitor {
 	List<MethodDeclaration> methods = new ArrayList<MethodDeclaration>();
+
+	public Map<MethodDeclaration, Set<MethodInvocation>> getMethodInvocationMap() {
+		return methodInvocationMap;
+	}
+
+	Map<MethodDeclaration,Set<MethodInvocation>> methodInvocationMap =new HashMap();
 	int nbMethod=0;
 
 	public CompilationUnit getCu() {
@@ -26,6 +32,14 @@ public class MethodDeclarationVisitor extends ASTVisitor {
 	public boolean visit(MethodDeclaration node) {
 		methods.add(node);
 		nbMethod++;
+		MethodInvocationVisitor visitor2 = new MethodInvocationVisitor();
+		node.accept(visitor2);
+		Set<MethodInvocation> methodInvoc=new HashSet<>();
+		for (MethodInvocation methodInvocation : visitor2.getMethods()) {
+			methodInvoc.add(methodInvocation);
+		}
+		methodInvocationMap.put(node,methodInvoc);
+
 		return super.visit(node);
 	}
 

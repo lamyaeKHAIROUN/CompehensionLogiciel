@@ -24,7 +24,7 @@ import java.util.Set;
 public class Graph<T> {
 
     // We use Hashmap to store the edges in the graph
-    private Map<Vertex, Set<Vertex>> map = new HashMap<>();
+    private Map<String, Set<String>> map = new HashMap<>();
 
     public DefaultDirectedGraph<String, DefaultEdge> getDefaultEdgeDefaultDirectedGraph() {
         return defaultEdgeDefaultDirectedGraph;
@@ -37,25 +37,24 @@ public class Graph<T> {
     DefaultDirectedGraph<String, DefaultEdge> defaultEdgeDefaultDirectedGraph = new DefaultDirectedGraph<>(DefaultEdge.class);
 
     // This function adds a new vertex to the graph
-    public void addVertex(Vertex s) {
+    public void addVertex(String s) {
         map.put(s, new LinkedHashSet<>());
     }
 
     // This function adds the edge
     // between source to destination
-    public void addEdge(Vertex source,
-                        Vertex destination)
+    public void addEdge(String source,
+                        String destination)
     {
 
         if (!map.containsKey(source))
             addVertex(source);
 
-        if (!map.containsKey(destination))
-            addVertex(destination);
+        /*if (!map.containsKey(destination))
+            addVertex(destination);*/
 
         map.get(source).add(destination);
-
-       // defaultEdgeDefaultDirectedGraph.addEdge(source.getLabel(),destination.getLabel());
+        //defaultEdgeDefaultDirectedGraph.addEdge(source,destination);
 
     }
 
@@ -69,7 +68,7 @@ public class Graph<T> {
     // This function gives the count of edges
     public void getEdgesCount(boolean bidirection) {
         int count = 0;
-        for (Vertex v : map.keySet()) {
+        for (String v : map.keySet()) {
             count += map.get(v).size();
         }
 
@@ -102,13 +101,13 @@ public class Graph<T> {
     }
 
     // Prints the adjancency list of each vertex.
-    public String toString() {
+    public String afficherGraph() {
         StringBuilder builder = new StringBuilder();
 
-        for (Vertex v : map.keySet()) {
-            builder.append(v.getType() + "::" + v.getLabel() + "    ");
-            for (Vertex w : map.get(v)) {
-                builder.append(w.getType() + "::" + w.getLabel() + "  ");
+        for (String v : map.keySet()) {
+            builder.append(v.toString() + ":==>    ");
+            for (String w : map.get(v)) {
+                builder.append(w.toString()+ "\t");
             }
             builder.append("\n");
         }
@@ -151,17 +150,17 @@ class MainGraph {
         Vertex v5 = new Vertex("n5", "t2");
         Vertex v6 = new Vertex("n6", "t3");
         Vertex v7 = new Vertex("n7", "t3");
-        g.addEdge(v1, v2);
-        g.addEdge(v1, v4);
-        g.addEdge(v4, v2);
-        g.addEdge(v1, v3);
-        g.addEdge(v5, v4);
-        g.addEdge(v2, v3);
-        g.addEdge(v3, v4);
+        g.addEdge(v1.getLabel(), v2.getLabel());
+        g.addEdge(v1.getLabel(), v4.getLabel());
+        g.addEdge(v4.getLabel(), v2.getLabel());
+        g.addEdge(v1.getLabel(), v3.getLabel());
+        g.addEdge(v5.getLabel(), v4.getLabel());
+        g.addEdge(v2.getLabel(), v3.getLabel());
+        g.addEdge(v3.getLabel(), v4.getLabel());
 
         // Printing the graph
         System.out.println("Graph d'appel:\n"
-                + g.toString());
+                + g.afficherGraph());
 
         // Gives the no of vertices in the graph.
         g.getVertexCount();

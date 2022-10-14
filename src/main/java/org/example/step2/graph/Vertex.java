@@ -25,6 +25,11 @@ public class Vertex {
         listAdj=new ArrayList<>();
     }
 
+    public String displayNode(){
+            return (this.getType()+"::"+this.label);
+        //return null;
+    }
+
     public Vertex(String label, String type) {
         this.label = label;
         this.type=type;
