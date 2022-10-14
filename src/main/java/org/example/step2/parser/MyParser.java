@@ -18,7 +18,7 @@ public class MyParser {
 
     public static final String jrePath = "C:\\Users\\SCD UM\\Downloads\\mini_project_in_project\\project";
 
-    public final String projectPath = "C:\\Users\\SCD UM\\Downloads\\mini_project_in_project\\project";
+    public final String projectPath = new String();
 
 
 

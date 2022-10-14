@@ -5,10 +5,12 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.SuperMethodInvocation;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class MethodInvocationVisitor extends ASTVisitor {
-	List<MethodInvocation> methods = new ArrayList<MethodInvocation>();
+	Set<MethodInvocation> methods = new HashSet<>();
 	int nbrMethod=0;
 	List<SuperMethodInvocation> superMethods = new ArrayList<SuperMethodInvocation>();
 	public boolean visit(MethodInvocation node) {
@@ -26,7 +28,7 @@ public class MethodInvocationVisitor extends ASTVisitor {
 	public int getNbrMethod(){
 		return nbrMethod;
 	}
-	public List<MethodInvocation> getMethods() {
+	public Set<MethodInvocation> getMethods() {
 		return methods;
 	}
 	

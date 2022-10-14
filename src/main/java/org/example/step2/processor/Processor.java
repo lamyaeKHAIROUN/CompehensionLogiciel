@@ -1,15 +1,25 @@
 package org.example.step2.processor;
 
+import com.mxgraph.layout.mxCircleLayout;
+import com.mxgraph.layout.mxIGraphLayout;
+import com.mxgraph.util.mxCellRenderer;
 import org.eclipse.jdt.core.dom.*;
 import org.example.step2.Main;
 import org.example.step2.graph.Graph;
 import org.example.step2.graph.Vertex;
 import org.example.step2.parser.MyParser;
 import org.example.step2.visitor.*;
+import org.jgraph.graph.DefaultEdge;
+import org.jgrapht.ext.JGraphXAdapter;
+import org.jgrapht.graph.DefaultDirectedGraph;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -21,6 +31,11 @@ public class Processor {
     private ClassDeclarationVisitor classDeclarationVisitor;
     private PackageDeclarationVisitor packageDeclarationVisitor;
     private Visitor visitor;
+    private DefaultDirectedGraph<String, DefaultEdge> graphJGraphT= new DefaultDirectedGraph<>(DefaultEdge.class);
+    private Set<String> setLink=new HashSet<>();
+    private Map<TypeDeclaration, Map<MethodDeclaration, Set<MethodInvocation>>> mapTheCallGraph =new HashMap<>();
+
+
 
     public Processor(String path) {
 
@@ -132,6 +147,8 @@ public class Processor {
         //13
         maximalParameterOfMethods(parser.getParse());
         callGraph();
+        graphData(parser.getParse());
+        buildGraphWithJGraphT();
     }
 
 
@@ -657,6 +674,93 @@ public class Processor {
         return g;
     }
 
-    //afficher graphe avec JgraphT
+    private void graphData(CompilationUnit cu) {
+
+        boolean isMethodNodeAdded;
+        ClassDeclarationVisitor visitorClass = new ClassDeclarationVisitor();
+        cu.accept(visitorClass);
+
+        for (TypeDeclaration nodeClass : visitorClass.getClasses()) {
+            MethodDeclarationVisitor visitorMethod = new MethodDeclarationVisitor();
+            nodeClass.accept(visitorMethod);
+
+            Map<MethodDeclaration, Set<MethodInvocation>> mapMethodDeclarationInvocation = new HashMap<>();
+            String caller;
+
+            for (MethodDeclaration nodeMethod : visitorMethod.getMethods()) {
+                nodeMethod.resolveBinding();
+                MethodInvocationVisitor visitorMethodInvocation = new MethodInvocationVisitor();
+                nodeMethod.accept(visitorMethodInvocation);
+                mapMethodDeclarationInvocation.put(nodeMethod,  visitorMethodInvocation.getMethods());
+
+                caller = nodeClass.getName().toString()+"::"+nodeMethod.getName();
+
+                isMethodNodeAdded = false;
+
+                for (MethodInvocation methodInvocation : visitorMethodInvocation.getMethods()) {
+
+                    String callee;
+
+                    if (methodInvocation.getExpression() != null) {
+                        if (methodInvocation.getExpression().resolveTypeBinding() != null) {
+                            if (!isMethodNodeAdded) {
+                                graphJGraphT.addVertex(caller);
+                                isMethodNodeAdded = true;
+                            }
+                            callee = methodInvocation.getExpression().resolveTypeBinding().getName()+"::"+methodInvocation.getName();
+                            graphJGraphT.addVertex(callee);
+                            graphJGraphT.addEdge(caller, callee);
+
+                            setLink.add("\t\""+caller+"\"->\""+callee+"\"\n");
+                        }
+                    }
+                    else if (methodInvocation.resolveMethodBinding() != null) {
+                        if (!isMethodNodeAdded) {
+                            graphJGraphT.addVertex(caller);
+                            isMethodNodeAdded = true;
+                        }
+                        callee = methodInvocation.resolveMethodBinding().getDeclaringClass().getName()+"::"+methodInvocation.getName();
+                        graphJGraphT.addVertex(callee);
+                        graphJGraphT.addEdge(caller, callee);
+
+                        setLink.add("\t\""+caller+"\"->\""+callee+"\"\n");
+                    }
+                    else {
+                        if (!isMethodNodeAdded) {
+                            graphJGraphT.addVertex(caller);
+                            isMethodNodeAdded = true;
+                        }
+                        callee = nodeClass.getName()+"::"+methodInvocation.getName();
+                        graphJGraphT.addVertex(callee);
+                        graphJGraphT.addEdge(caller, callee);
+
+                        setLink.add("\t\""+caller+"\"->\""+callee+"\"\n");
+                    }
+                }
+            }
+            mapTheCallGraph.put(nodeClass, mapMethodDeclarationInvocation);
+        }
+    }
+
+
+    public void buildGraphWithJGraphT() throws IOException {
+        JGraphXAdapter<String, DefaultEdge> graphAdapter = new JGraphXAdapter<String, DefaultEdge>(graphJGraphT);
+        mxIGraphLayout layout = new mxCircleLayout(graphAdapter);
+        layout.execute(graphAdapter.getDefaultParent());
+
+        BufferedImage image = mxCellRenderer.createBufferedImage(graphAdapter, null, 2, Color.WHITE, true, null);
+        File imgFile = new File("graph_jgrapht.png");
+        if (imgFile.exists())
+            imgFile.delete();
+
+        ImageIO.write(image, "PNG", imgFile);
+
+        if (!imgFile.exists()) {
+            System.err.println("Le fichier "+imgFile.getName()+" n'a pas pu être créé !");
+        }
+        else {
+            System.out.println(imgFile.getAbsolutePath());
+        }
+    }
 
 }
