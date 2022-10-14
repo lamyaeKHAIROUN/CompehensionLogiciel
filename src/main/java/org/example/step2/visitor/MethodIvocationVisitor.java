@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class MethodInvocationVisitor extends ASTVisitor {
+public class MethodIvocationVisitor extends ASTVisitor  {
 	Set<MethodInvocation> methods = new HashSet<>();
 	int nbrMethod=0;
 	List<SuperMethodInvocation> superMethods = new ArrayList<SuperMethodInvocation>();
@@ -36,3 +36,4 @@ public class MethodInvocationVisitor extends ASTVisitor {
 		return superMethods;
 	}
 }
+

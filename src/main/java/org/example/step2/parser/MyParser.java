@@ -16,7 +16,7 @@ public class MyParser {
 
     private int nbLinesOfCodes;
 
-    public static final String jrePath = "C:\\Users\\SCD UM\\Downloads\\mini_project_in_project\\project";
+    public static final String jrePath = "C:\\Users\\SCD UM\\Downloads\\Comparateur\\Comparateur\\";
 
     public final String projectPath = new String();
 
@@ -188,4 +188,3 @@ public class MyParser {
 
 
 }
-

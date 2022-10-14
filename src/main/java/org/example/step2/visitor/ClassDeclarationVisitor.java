@@ -103,5 +103,3 @@ public class ClassDeclarationVisitor extends Visitor {
     }
 
 }
-
-

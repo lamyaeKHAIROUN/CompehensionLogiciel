@@ -105,9 +105,9 @@ public class Graph<T> {
         StringBuilder builder = new StringBuilder();
 
         for (String v : map.keySet()) {
-            builder.append(v.toString() + ":==>    ");
+            builder.append(v.toString() + ": ==> ");
             for (String w : map.get(v)) {
-                builder.append(w.toString()+ "\t");
+                builder.append(w.toString()+ "  ");
             }
             builder.append("\n");
         }
@@ -184,119 +184,3 @@ class MainGraph {
 
 
 }
-/*
-import java.util.*;
-
-class Graph {
-    //chaque noeud a une liste des noeuds en relation ==> chaque méthode a une
-  //  private Map<Vertex, List<Vertex>> adjVertices= new HashMap<Vertex, List<Vertex>>();
-    private Set<Vertex> adjVertices;
-    // standard constructor, getters, setters
-
-    /*public Graph(Map<Vertex, List<Vertex>> adjVertices) {
-        this.adjVertices = adjVertices;
-    }
-*//*
-    public Graph() {
-        adjVertices=new HashSet<>();
-    }
-
-    public Set<Vertex> getAdjVertices() {
-        return adjVertices;
-    }
-
-    public void setAdjVertices(Set<Vertex> adjVertices) {
-        this.adjVertices = adjVertices;
-    }
-
-
-    void addVertex(Vertex v) {
-        adjVertices.add(v);
-    }
-
-   /* void removeVertex(String label) {
-        Vertex v = new Vertex(label);
-        adjVertices.values().stream().forEach(e -> e.remove(v));
-        adjVertices.remove(new Vertex(label));
-    }*/
-/*
-
-    void addEdge(Vertex source, Vertex target) {
-        //Vertex v1 = new Vertex(label1);
-        //Vertex v2 = new Vertex(label2);
-        //adjVertices.get(v1).add(v2);
-        source.getListAdj().add(target);
-        System.out.println("cccccc "+ source.getListAdj().size());
-
-        /*if (adjVertices.get(v1) != null) {
-        }
-        /*if (adjVertices.get(v2) != null) {
-            adjVertices.get(v2).add(v1);
-        }*//*
-    }
-
-
-//exemple
-    Graph createGraph() {
-        Graph graph = new Graph();
-        Vertex v=new Vertex("n1");
-        Vertex v2=new Vertex("n2");
-        Vertex v3=new Vertex("n3");
-        Vertex v4=new Vertex("n4");
-        Vertex v5=new Vertex("n5");
-        Vertex v6=new Vertex("n6");
-        Vertex v7=new Vertex("n7");
-        graph.addVertex(new Vertex("n2"));
-        graph.addVertex(new Vertex("n3"));
-        graph.addVertex(new Vertex("n4"));
-        graph.addVertex(new Vertex("n5"));
-        graph.addVertex(new Vertex("n6"));
-        graph.addVertex(new Vertex("n7"));
-        graph.addEdge(v, v2);
-        graph.addEdge(v3, v4);
-
-        graph.addEdge(v3, v5);
-        graph.addEdge(v5, v6);
-        graph.addEdge(v5, v7);
-        graph.addEdge(v7, v);
-        graph.addEdge(v7, v3);
-        return graph;
-    }
-    //obtenir la listes des sommets adjascents d'un sommet
-
-
-
-
-    public static void main(String[] args) {
-        Vertex v1=new Vertex("v1");
-        Vertex v2=new Vertex("v2");
-        List<Vertex> l1= new ArrayList<>();
-        List<Vertex> l2= new ArrayList<>();
-        l1.add(new Vertex("v11"));
-        l1.add(new Vertex("v12"));
-        l1.add(new Vertex("v13"));
-        l1.add(new Vertex("v21"));
-        l1.add(new Vertex("v22"));
-        l1.add(new Vertex("v23"));
-        Map<Vertex, List<Vertex>> adjVertices=new HashMap<>();
-        adjVertices.put(v1,l1);
-        adjVertices.put(v2,l2);
-
-        List<Vertex> listeAdj=new ArrayList<>();
-       Graph graph =new Graph();
-          Graph g=graph.createGraph();
-      //  Set<String> list = new LinkedHashSet<String>();
-        //list=breadthFirstTraversal(graph,"Bob");
-        Set<Vertex> set=g.getAdjVertices();
-
-        for(Vertex v: set){
-            System.out.println("ver: "+v.getLabel());
-            System.out.println("liste des vertexes: ");
-            System.out.println("size: "+v.getListAdj().size());
-            for (Vertex v3: v.getListAdj()){
-                System.out.println(v3.getLabel());
-            }
-        }
-
-    }
-}*/

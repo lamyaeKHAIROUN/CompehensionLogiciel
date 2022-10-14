@@ -1,5 +1,6 @@
 package org.example.step2.visitor;
 
+
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
@@ -32,7 +33,7 @@ public class MethodDeclarationVisitor extends ASTVisitor {
 	public boolean visit(MethodDeclaration node) {
 		methods.add(node);
 		nbMethod++;
-		MethodInvocationVisitor visitor2 = new MethodInvocationVisitor();
+		MethodIvocationVisitor visitor2 = new MethodIvocationVisitor();
 		node.accept(visitor2);
 		Set<MethodInvocation> methodInvoc=new HashSet<>();
 		for (MethodInvocation methodInvocation : visitor2.getMethods()) {
