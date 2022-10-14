@@ -85,7 +85,7 @@ public class Graph<T> {
         StringBuilder builder = new StringBuilder();
 
         for (Vertex v : map.keySet()) {
-            builder.append(v.getType()+"::"+v.getLabel() + ": ");
+            builder.append(v.getType()+"::"+v.getLabel() + ": invoc ===>");
             for (Vertex w : map.get(v)) {
                 builder.append(w.getType()+"::"+w.getLabel() + " ");
             }

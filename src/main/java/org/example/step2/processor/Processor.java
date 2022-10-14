@@ -2,6 +2,7 @@ package org.example.step2.processor;
 
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.example.step2.Main;
 import org.example.step2.graph.Graph;
@@ -48,7 +49,6 @@ public class Processor {
             parse.accept(visitor);
         }
         Map<TypeDeclaration, Map<String, Integer>> classContent = new HashMap<>(visitor.getClasseCollection());
-        Map<String, Integer> classMethodsSorted = new HashMap<>();
 
         Set set = classContent.entrySet();
 
@@ -59,8 +59,6 @@ public class Processor {
         // Afficher tous les éléments de la liste
         while (itr.hasNext()) {
             Map.Entry mentry = (Map.Entry) itr.next();
-            //  System.out.print("Methode: " + mentry.getKey() + " - ");
-            // System.out.println("NBLigne: " + mentry.getValue() + "\n\n\n");
             TypeDeclaration typeDeclaration = (TypeDeclaration) mentry.getKey();
             percent = (int) ((typeDeclaration.getMethods().length) * 0.1);
             if (percent == 0) {
@@ -137,6 +135,7 @@ public class Processor {
         top10PercentMethodByLinesByClass();
         //13
         maximalParameterOfMethods(parser.getParse());
+        callGraph();
     }
 
 
@@ -541,10 +540,6 @@ public class Processor {
     /*Pour l'interface graphique********************************************/
 
 
-    /*public String exercice1() {
-        return String.valueOf(classDeclarationVisitor.getNbClasses());
-    }*/
-
     public String exercice1() throws IOException {
         return String.valueOf(nbClasses(parser.getParse()));
     }
@@ -609,9 +604,51 @@ public class Processor {
 
 
     /*-----------------------------------------------*/
-    public Graph callGraph() {
+    //graph
+    public Graph callGraph() throws IOException {
         Graph<Vertex> g = new Graph<Vertex>();
+        Vertex source=new Vertex();
+        Vertex target=new Vertex();
+        List<String> filesContent = this.getJavaFiles();
+        ClassDeclarationVisitor visitor = new ClassDeclarationVisitor();
+        CompilationUnit parse;
+        for (String fileContent : filesContent) {
+            parse = parser.getCompilationUnit(fileContent);
+            parse.accept(visitor);
+        }
+        Map<TypeDeclaration, Set<MethodDeclaration>> classContent = new HashMap<>(visitor.getClasseMapMethods());
+        Set set = classContent.entrySet();
 
+        Iterator itr = set.iterator();
+        Set<MethodDeclaration> mapMethod = new HashSet<>();
+        while (itr.hasNext()) {
+            Map.Entry mentry = (Map.Entry) itr.next();
+            //la classe en question
+            TypeDeclaration typeDeclaration = (TypeDeclaration) mentry.getKey();
+            //get la liste de methodes
+            mapMethod = (Set<MethodDeclaration>) mentry.getValue();
+
+
+            for (MethodDeclaration method : mapMethod) {
+                MethodInvocationVisitor visitor2 = new MethodInvocationVisitor();
+                method.accept(visitor2);
+                source=new Vertex(String.valueOf(method.getName()),String.valueOf(typeDeclaration.getName()));
+                for (MethodInvocation methodInvocation : visitor2.getMethods()) {
+                   /* System.out.println("method " + method.getName() + " invoc method "
+                            + methodInvocation.getName());*/
+                    String type=" type invoc";
+                    target=new Vertex(String.valueOf(methodInvocation.getName()),type);
+                    g.addEdge(source,target);
+
+
+                }
+
+            }
+
+        }
+
+        System.out.println("Graph:\n"
+                +g.toString());
 
         return g;
     }

@@ -41,7 +41,7 @@ public class Parser {
             content2 = FileUtils.readFileToString(fileEntry);
             parse2 = parse(content2.toCharArray());
             // print methods info
-           // printMethodInfo(parse);
+            printMethodInfo(parse);
             // print packages info
             //printPackageInfo(parse2);
 
@@ -49,7 +49,7 @@ public class Parser {
             //printVariableInfo(parse);
 
             //print method invocations
-            //printMethodInvocationInfo(parse);
+            printMethodInvocationInfo(parse);
             //print classes info
             //printClassesInfo(parse);
             //nombre de classes

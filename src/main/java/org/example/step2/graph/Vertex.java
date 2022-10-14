@@ -7,6 +7,10 @@ public class Vertex {
     String label;
     String type;
 
+    public Vertex() {
+
+    }
+
     public List<Vertex> getListAdj() {
         return listAdj;
     }
@@ -21,7 +25,7 @@ public class Vertex {
         listAdj=new ArrayList<>();
     }
 
-    Vertex(String label,String type) {
+    public Vertex(String label, String type) {
         this.label = label;
         this.type=type;
     }

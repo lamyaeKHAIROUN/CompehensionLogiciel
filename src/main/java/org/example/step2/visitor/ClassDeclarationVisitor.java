@@ -1,9 +1,6 @@
 package org.example.step2.visitor;
 
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.FieldDeclaration;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
-import org.eclipse.jdt.core.dom.TypeDeclaration;
+import org.eclipse.jdt.core.dom.*;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -28,10 +25,15 @@ public class ClassDeclarationVisitor extends Visitor {
             classes.add(node);
             nbClasses++;
             Map<String, Integer> methodsCollection = new HashMap<>();
+            Set<MethodDeclaration> methodList = new HashSet<>();
             for (MethodDeclaration methodDeclaration : node.getMethods()) {
                 methodsCollection.put(methodDeclaration.getName().getIdentifier(), countLines(methodDeclaration.getBody().toString()));
+                methodList.add(methodDeclaration);
+
             }
             classeCollection.put(node, methodsCollection);
+            classeMapMethods.put(node,methodList);
+
         }
         return super.visit(node);
     }
