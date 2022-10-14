@@ -6,8 +6,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 
 public class ClassDeclarationVisitor extends Visitor {
@@ -15,9 +14,21 @@ public class ClassDeclarationVisitor extends Visitor {
     private CompilationUnit cu;
     List<MethodDeclaration> methodDeclarations =new ArrayList<>();
     private List<TypeDeclaration> classes = new ArrayList<>();
+    private Map<TypeDeclaration, Map<String, Integer>> classeCollection = new HashMap<>();
+
+    public Map<TypeDeclaration, Set<MethodDeclaration>> getClasseMapMethods() {
+        return classeMapMethods;
+    }
+
+    private Map<TypeDeclaration, Set<MethodDeclaration>> classeMapMethods = new HashMap<>();
+
     String content;
     List<FieldDeclaration> attributs = new ArrayList<FieldDeclaration>();
     private int nbLinesOfCodes=0;
+
+    public Map<TypeDeclaration, Map<String, Integer>> getClasseCollection() {
+        return classeCollection;
+    }
 
     @Override
     public boolean visit(TypeDeclaration node) {

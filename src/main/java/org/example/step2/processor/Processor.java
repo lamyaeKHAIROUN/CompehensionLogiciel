@@ -146,7 +146,6 @@ public class Processor {
     }
 
 
-
     public List<String> getJavaFiles() {
         File directory = new File(path);
         return parser.getFilesPaths(directory);
@@ -497,7 +496,7 @@ public class Processor {
     //13. Le	nombre	maximal	de	paramètres	par	rapport	à	toutes	les	méthodes	de l’application.
     public String maximalParameterOfMethods(CompilationUnit cu) throws IOException {
         HashMap<String, Integer> myMethods = new HashMap<String, Integer>();
-        String s=null;
+        String s = null;
         ClassDeclarationVisitor visitorClass = new ClassDeclarationVisitor();
         cu.accept(visitorClass);
         for (TypeDeclaration nodeClass : visitorClass.getClasses()) {
@@ -515,7 +514,7 @@ public class Processor {
         String key = mapping.getKey();
         String value = String.valueOf(mapping.getValue());
         System.out.println("La méthode ayant le plus grand nombre de paramettres est: " + key + " le nombre de ses paramettres est: " + value);
-        s="La méthode ayant le plus grand nombre de paramettres est: " + key + "\n le nombre de ses paramettres est: " + value;
+        s = "La méthode ayant le plus grand nombre de paramettres est: " + key + "\n le nombre de ses paramettres est: " + value;
         return s;
     }
 
@@ -543,6 +542,7 @@ public class Processor {
     public String exercice1() throws IOException {
         return String.valueOf(nbClasses(parser.getParse()));
     }
+
     public String exercice2() throws IOException {
         return String.valueOf(parser.getNbLinesOfCodes());
     }
@@ -581,10 +581,16 @@ public class Processor {
         return returnListAsString(top10ClaassByMethAndAttr(parser.getParse()));
 
     }
+
     public String exercice11() throws IOException {
         return classWithXmethod(parser.getParse(), 3);
 
     }
+    public String exercice12() throws IOException {
+        return top10PercentMethodByLinesByClass();
+
+    }
+
     public String exercice13() throws IOException {
         return maximalParameterOfMethods(parser.getParse());
 
