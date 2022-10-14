@@ -16,6 +16,7 @@ import java.util.List;
 public class ClassDeclarationVisitor extends Visitor {
     private int nbClasses;
     private CompilationUnit cu;
+    List<MethodDeclaration> methodDeclarations =new ArrayList<>();
     private List<TypeDeclaration> classes = new ArrayList<>();
     String content;
     List<FieldDeclaration> attributs = new ArrayList<FieldDeclaration>();
@@ -26,12 +27,11 @@ public class ClassDeclarationVisitor extends Visitor {
         if (!node.isInterface()) {
             classes.add(node);
             nbClasses++;
-            List<MethodDeclaration> methodDeclarations =new ArrayList<>();
-            MethodDeclarationVisitor visitorMethod = new MethodDeclarationVisitor();
-            node.accept(visitorMethod);
-            methodDeclarations= List.of(node.getMethods());
-          //  for (47)
-
+            Map<String, Integer> methodsCollection = new HashMap<>();
+            for (MethodDeclaration methodDeclaration : node.getMethods()) {
+                methodsCollection.put(methodDeclaration.getName().getIdentifier(), countLines(methodDeclaration.getBody().toString()));
+            }
+            classeCollection.put(node, methodsCollection);
         }
         return super.visit(node);
     }

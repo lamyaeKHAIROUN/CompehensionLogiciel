@@ -4,6 +4,8 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.example.step2.Main;
+import org.example.step2.graph.Graph;
+import org.example.step2.graph.Vertex;
 import org.example.step2.parser.MyParser;
 import org.example.step2.visitor.*;
 
@@ -31,16 +33,74 @@ public class Processor {
         visitor = new Visitor();
     }
 
-    public void parseClasses() throws FileNotFoundException, IOException {
-        List<String> javaFilesPaths = this.getJavaFiles();
+
+    //12.bis
+    public String top10PercentMethodByLinesByClass() throws FileNotFoundException, IOException {
+        List<String> filesContent = this.getJavaFiles();
+        ClassDeclarationVisitor visitor = new ClassDeclarationVisitor();
         CompilationUnit parse;
-        for (String filePath : javaFilesPaths) {
-            parse = parser.getCompilationUnit(filePath);
-            classDeclarationVisitor.setCu(parse);
-            parse.accept(classDeclarationVisitor);
+        Map<String, Integer> classMethodSorted = new HashMap<>();
+
+        int percent = 0;
+
+        for (String fileContent : filesContent) {
+            parse = parser.getCompilationUnit(fileContent);
+            parse.accept(visitor);
+        }
+        Map<TypeDeclaration, Map<String, Integer>> classContent = new HashMap<>(visitor.getClasseCollection());
+        Map<String, Integer> classMethodsSorted = new HashMap<>();
+
+        Set set = classContent.entrySet();
+
+        Iterator itr = set.iterator();
+        Map<String, Integer> mapMethod = new HashMap<>();
+        Map<String, Integer> mapMethodSort = new HashMap<>();
+        String str=new String();
+        // Afficher tous les éléments de la liste
+        while (itr.hasNext()) {
+            Map.Entry mentry = (Map.Entry) itr.next();
+            //  System.out.print("Methode: " + mentry.getKey() + " - ");
+            // System.out.println("NBLigne: " + mentry.getValue() + "\n\n\n");
+            TypeDeclaration typeDeclaration = (TypeDeclaration) mentry.getKey();
+            percent = (int) ((typeDeclaration.getMethods().length) * 0.1);
+            if (percent == 0) {
+                percent = 1;
+            }
+            System.out.println("nom de classe : "+typeDeclaration.getName());
+            mapMethod = (Map<String, Integer>) mentry.getValue();
+
+            List<String> ls = listSort((HashMap<String, Integer>) mapMethod);
+            Collections.reverse(ls);
+            if(ls.size()==0){
+
+               // System.out.println( "Cette classe n'a pas de méthode\n");
+                str="Cette classe n'a pas de méthode\n";
+            } else {
+            for (int i=0;i<percent;i++){
+                str="Methode N° "+i+1+": "+ls.get(i)+"\n";
+                //return  str;
+            }
+
+            }
+            System.out.println(str);
+
 
         }
 
+
+
+        return str;
+    }
+
+
+
+    private int percentageCalculation(int nbMethod) {
+        int percent = 0;
+        percent = ((int) (nbMethod * 0.1));
+        if (percent == 0) {
+            percent = 1;
+        }
+        return percent;
     }
 
 
@@ -72,7 +132,9 @@ public class Processor {
         //11. Les	classes	qui	possèdent plus	de	X	méthodes	(la	valeur	de X	est	donnée).
         classWithXmethod(parser.getParse(), 3);
         //12. Les	10%	des	méthodes	qui	possèdent	le	plus	grand	nombre	de	lignes	de	code	(par cl
-        maxLigneMethodeByClass(parser.getParse());
+        //maxLigneMethodeByClass(parser.getParse());
+        System.out.println("Les 10% des méthodes ayant le plus grand nombre de lignes par classe: ");
+        top10PercentMethodByLinesByClass();
         //13
         maximalParameterOfMethods(parser.getParse());
     }
@@ -336,9 +398,10 @@ public class Processor {
     }
 
     //11. Les	classes	qui	possèdent plus	de	X	méthodes	(la	valeur	de X	est	donnée).
-    public List<String> classWithXmethod(CompilationUnit cu, int x) {
+    public String classWithXmethod(CompilationUnit cu, int x) {
         List<String> myClassList = new ArrayList<>();
         HashMap<String, Integer> myClasses = new HashMap<String, Integer>();
+        String s = null;
 
         int nbMethod = 0;
         ClassDeclarationVisitor visitorClass = new ClassDeclarationVisitor();
@@ -355,11 +418,13 @@ public class Processor {
         }
         Set<Map.Entry<String, Integer>> mylistXclass = myClasses.entrySet();
         System.out.println("Les classes ayant un nombre de méthodes superieur à " + x + ": ");
+        StringBuilder sb = new StringBuilder();
         for (Map.Entry<String, Integer> mapping : mylistXclass) {
             System.out.println(mapping.getKey() + " ==> " + mapping.getValue());
+            s += mapping.getKey() + " ==> " + mapping.getValue() + "\n";
         }
 
-        return myClassList;
+        return s;
 
     }
     //12. Les	10%	des	méthodes	qui	possèdent	le	plus	grand	nombre	de	lignes	de	code	(par classe).
@@ -377,7 +442,12 @@ public class Processor {
         int nbLines = 0;
         ClassDeclarationVisitor visitorClass = new ClassDeclarationVisitor();
         cu.accept(visitorClass);
-        for (TypeDeclaration nodeClass : visitorClass.getClasses()) {
+
+
+
+
+
+        /*for (TypeDeclaration nodeClass : visitorClass.getClasses()) {
             MethodDeclarationVisitor visitorMethod = new MethodDeclarationVisitor();
             // nodeClass.accept(visitorMethod);
             //System.out.println("Classes name: " + nodeClass.getName());
@@ -418,8 +488,10 @@ public class Processor {
            /* System.out.println("les 10% des méthode ayant le plus grand nombre de lignes pour la classe: " + nodeClass.getName());
             for (int i = 0; i < percent; i++) {
                 System.out.println(" " + myMethodList.get(i));
-            }*/
-        }
+            }
+        }*/
+
+
     }
 
 
@@ -515,7 +587,7 @@ public class Processor {
 
     }
     public String exercice11() throws IOException {
-        return returnListAsString(classWithXmethod(parser.getParse(), 3));
+        return classWithXmethod(parser.getParse(), 3);
 
     }
     public String exercice13() throws IOException {
@@ -533,6 +605,15 @@ public class Processor {
             }
         }
         return sb.toString();
+    }
+
+
+    /*-----------------------------------------------*/
+    public Graph callGraph() {
+        Graph<Vertex> g = new Graph<Vertex>();
+
+
+        return g;
     }
 
 }

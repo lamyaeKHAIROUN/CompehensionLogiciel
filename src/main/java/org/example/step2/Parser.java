@@ -41,7 +41,7 @@ public class Parser {
             content2 = FileUtils.readFileToString(fileEntry);
             parse2 = parse(content2.toCharArray());
             // print methods info
-            //printMethodInfo(parse);
+           // printMethodInfo(parse);
             // print packages info
             //printPackageInfo(parse2);
 
@@ -54,16 +54,16 @@ public class Parser {
             //printClassesInfo(parse);
             //nombre de classes
             // getFileContent(projectSourcePath);
-            ClassesAttributes(parse);
+            /*ClassesAttributes(parse);
             nbp=nbPackages(parse,myPackageList);
-            maxLigneMethodeByClass(parse2);
-
+            maxLigneMethodeByClass(parse2);*/
         }
+        maxLigneMethodeByClass(parse2);
 
 
         // System.out.println("Le nombre de classes de l'application: " + nbClasses(parse));
        //System.out.println("Le nombre de lignes de l'application: " + nbLines(parse,content));
-        System.out.println("Le nombre de méthodes de l'application: " + numberOfMethods(parse));
+        /*System.out.println("Le nombre de méthodes de l'application: " + numberOfMethods(parse));
         averageMethode(parse);
       /* System.out.println("Le nombre moyen de lignes par méthodes: " + averageLinesByMethod(parse));
        // System.out.println("Le nombre moyen d'attributs par classe: " + ClassesAttributes(parse) / nbClasses(parse));
@@ -441,7 +441,7 @@ public class Parser {
         int percent = 0;
         int nbLines = 0;
         ClassDeclarationVisitor visitorClass = new ClassDeclarationVisitor();
-        cu.accept(visitorClass);
+        parse.accept(visitorClass);
         for (TypeDeclaration nodeClass : visitorClass.getClasses()) {
             MethodDeclarationVisitor visitorMethod = new MethodDeclarationVisitor();
             nodeClass.accept(visitorMethod);
@@ -493,7 +493,7 @@ public class Parser {
         for (TypeDeclaration nodeClass : visitorClass.getClasses()) {
 
             MethodDeclarationVisitor visitor = new MethodDeclarationVisitor();
-            parse.accept(visitor);
+            cu.accept(visitor);
 
             for (MethodDeclaration method : visitor.getMethods()) {
 
