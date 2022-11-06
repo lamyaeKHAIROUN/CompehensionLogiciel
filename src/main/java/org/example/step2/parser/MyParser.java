@@ -178,7 +178,6 @@ public class MyParser {
 
             content2 = FileUtils.readFileToString(fileEntry);
             parse = parse(content2.toCharArray());
-            System.out.println("hhhhhhhhhhhhhhhhhhhhhhhhh");
             listCu.add(parse);
             System.out.println(listCu);
         }

@@ -4,6 +4,9 @@ package org.example.step2.graph;
 import com.mxgraph.layout.mxCircleLayout;
 import com.mxgraph.layout.mxIGraphLayout;
 import com.mxgraph.util.mxCellRenderer;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.jgraph.JGraph;
 import org.jgraph.graph.DefaultEdge;
 import org.jgrapht.ext.JGraphModelAdapter;
@@ -16,19 +19,36 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class Graph<T> {
 
     // We use Hashmap to store the edges in the graph
-    private Map<String, Set<String>> map = new HashMap<>();
+    private Map<Vertex, Set<Vertex>> map = new HashMap<>();
+    private Set<String> nodes=new HashSet<>();
+    private Set<Vertex> vertexes =new HashSet<>();
 
+
+
+    public Map<MethodDeclaration, Set<MethodInvocation>> getInvocations() {
+        return invocations;
+    }
+
+    public void setInvocations(Map<MethodDeclaration, Set<MethodInvocation>>invocations) {
+        this.invocations = invocations;
+    }
+
+    private Map<MethodDeclaration, Set<MethodInvocation>> invocations = new HashMap<>();
+
+    public void setClassDataMap(Map<TypeDeclaration, Map<MethodDeclaration, Set<MethodInvocation>>> classDataMap) {
+        this.classDataMap = classDataMap;
+    }
+
+    private Map<TypeDeclaration, Map<MethodDeclaration, Set<MethodInvocation>>> classDataMap=new HashMap<>();
     public DefaultDirectedGraph<String, DefaultEdge> getDefaultEdgeDefaultDirectedGraph() {
         return defaultEdgeDefaultDirectedGraph;
     }
+
 
     public void setDefaultEdgeDefaultDirectedGraph(DefaultDirectedGraph<String, DefaultEdge> defaultEdgeDefaultDirectedGraph) {
         this.defaultEdgeDefaultDirectedGraph = defaultEdgeDefaultDirectedGraph;
@@ -37,20 +57,20 @@ public class Graph<T> {
     DefaultDirectedGraph<String, DefaultEdge> defaultEdgeDefaultDirectedGraph = new DefaultDirectedGraph<>(DefaultEdge.class);
 
     // This function adds a new vertex to the graph
-    public void addVertex(String s) {
+    public void addVertex(Vertex s) {
         map.put(s, new LinkedHashSet<>());
     }
 
     // This function adds the edge
     // between source to destination
-    public void addEdge(String source,
-                        String destination)
+    public void addEdge(Vertex source,
+                        Vertex destination)
     {
 
         if (!map.containsKey(source))
             addVertex(source);
 
-        /*if (!map.containsKey(destination))
+       /* if (!map.containsKey(destination))
             addVertex(destination);*/
 
         map.get(source).add(destination);
@@ -68,7 +88,7 @@ public class Graph<T> {
     // This function gives the count of edges
     public void getEdgesCount(boolean bidirection) {
         int count = 0;
-        for (String v : map.keySet()) {
+        for (Vertex v : map.keySet()) {
             count += map.get(v).size();
         }
 
@@ -104,9 +124,9 @@ public class Graph<T> {
     public String afficherGraph() {
         StringBuilder builder = new StringBuilder();
 
-        for (String v : map.keySet()) {
+        for (Vertex v : map.keySet()) {
             builder.append(v.toString() + ": ==> ");
-            for (String w : map.get(v)) {
+            for (Vertex w : map.get(v)) {
                 builder.append(w.toString()+ "  ");
             }
             builder.append("\n");
@@ -150,13 +170,13 @@ class MainGraph {
         Vertex v5 = new Vertex("n5", "t2");
         Vertex v6 = new Vertex("n6", "t3");
         Vertex v7 = new Vertex("n7", "t3");
-        g.addEdge(v1.getLabel(), v2.getLabel());
-        g.addEdge(v1.getLabel(), v4.getLabel());
-        g.addEdge(v4.getLabel(), v2.getLabel());
-        g.addEdge(v1.getLabel(), v3.getLabel());
-        g.addEdge(v5.getLabel(), v4.getLabel());
-        g.addEdge(v2.getLabel(), v3.getLabel());
-        g.addEdge(v3.getLabel(), v4.getLabel());
+        g.addEdge(v1, v2);
+        g.addEdge(v1, v4);
+        g.addEdge(v4, v2);
+        g.addEdge(v1, v3);
+        g.addEdge(v5, v4);
+        g.addEdge(v2, v3);
+        g.addEdge(v3, v4);
 
         // Printing the graph
         System.out.println("Graph d'appel:\n"
@@ -184,3 +204,5 @@ class MainGraph {
 
 
 }
+
+

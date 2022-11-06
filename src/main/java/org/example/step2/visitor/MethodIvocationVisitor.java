@@ -14,8 +14,10 @@ public class MethodIvocationVisitor extends ASTVisitor  {
 	int nbrMethod=0;
 	List<SuperMethodInvocation> superMethods = new ArrayList<SuperMethodInvocation>();
 	public boolean visit(MethodInvocation node) {
+		if(!methods.contains(node)){
+			//System.out.println("adding.."+node.getName().getIdentifier());
 		methods.add(node);
-		nbrMethod++;
+		nbrMethod++;}
 		return super.visit(node);
 	}
 	
