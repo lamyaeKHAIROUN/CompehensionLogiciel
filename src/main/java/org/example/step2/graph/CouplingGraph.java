@@ -22,34 +22,34 @@ public class CouplingGraph {
 
     Map<String, Map<String, Float>> classCalls = new TreeMap<>();
 
-    ListenableDirectedWeightedGraph<String, MyWeightedEdge> graphJGraphT= new ListenableDirectedWeightedGraph<String, MyWeightedEdge>(MyWeightedEdge.class);
+    ListenableDirectedWeightedGraph<String, MyWeightedEdge> graphJGraphT = new ListenableDirectedWeightedGraph<String, MyWeightedEdge>(MyWeightedEdge.class);
 
-    //private SimpleWeightedGraph<String, DefaultWeightedEdge> graphJGraphT= new SimpleWeightedGraph<>(DefaultWeightedEdge.class);
-    float couplage=0;
-    public Map<String, Map<String, Float>> createCouplingGraph(CallGraph callGraph){
+    float couplage = 0;
+
+    public Map<String, Map<String, Float>> createCouplingGraph(CallGraph callGraph) {
         Map<TypeDeclaration, Map<MethodDeclaration, Set<MethodInvocation>>> mapTheCallGraph = callGraph.getMapTheCallGraph();
-        MetricClass metricClass=new MetricClass();
+        MetricClass metricClass = new MetricClass();
         String class1;
         String class2;
         for (TypeDeclaration ts : mapTheCallGraph.keySet()) {
-            class1=ts.getName().getIdentifier();
+            class1 = ts.getName().getIdentifier();
             graphJGraphT.addVertex(class1);
             //ajout de classe dans la map
-            classCalls.put(class1,new HashMap<String, Float>());
+            classCalls.put(class1, new HashMap<String, Float>());
 
-            for(TypeDeclaration ts2 : mapTheCallGraph.keySet()){
-                class2=ts2.getName().getIdentifier();
-                if (!class1.equals(class2)){
+            for (TypeDeclaration ts2 : mapTheCallGraph.keySet()) {
+                class2 = ts2.getName().getIdentifier();
+                if (!class1.equals(class2)) {
                     //calculer le couplage entre les deux classes
-                    couplage= metricClass.metricMethod(callGraph,class1,class2);
-                    if (couplage>0){
+                    couplage = metricClass.metricMethod(callGraph, class1, class2);
+                    if (couplage > 0) {
                         //System.out.println("couplage entre class "+class1+ " et class: "+class2+" : "+couplage);
                         //si le couplage entre les deux classes est sup à 0, alors on ajoute cette classe dans la liste de classe appelées avec la valeur de couplage
-                        classCalls.get(class1).put(class2,couplage);
+                        classCalls.get(class1).put(class2, couplage);
                         graphJGraphT.addVertex(class2);
-                        if(graphJGraphT.getEdge(class1,class2)==null){
-                            MyWeightedEdge e= graphJGraphT.addEdge(class1,class2);
-                             graphJGraphT.setEdgeWeight( e,(double) couplage);
+                        if (graphJGraphT.getEdge(class1, class2) == null) {
+                            MyWeightedEdge e = graphJGraphT.addEdge(class1, class2);
+                            graphJGraphT.setEdgeWeight(e, (double) couplage);
 
                         }
 
@@ -58,25 +58,24 @@ public class CouplingGraph {
                 }
             }
         }
-        afficherCouplingGraph(classCalls);
         return classCalls;
-        }
+    }
 
 
-        public  void afficherCouplingGraph(Map<String, Map<String, Float>> couplingGraph){
+    public void afficherCouplingGraph(Map<String, Map<String, Float>> couplingGraph) {
 
-            for (String s: couplingGraph.keySet()){
-                //recuperer la map des classes appelé avec leur valeur de couplage
-                Map<String, Float> classes=couplingGraph.get(s);
-                System.out.println("\nLa classe: "+s+" a un couplages avec:");
-                for (String s2: classes.keySet()){
-                    System.out.println("\t La classe: "+s2+" ==> pourcentage de couplage (poids): "+classes.get(s2));
-
-                }
+        for (String s : couplingGraph.keySet()) {
+            //recuperer la map des classes appelé avec leur valeur de couplage
+            Map<String, Float> classes = couplingGraph.get(s);
+            System.out.println("\nLa classe: " + s + " a un couplages avec:");
+            for (String s2 : classes.keySet()) {
+                System.out.println("\t La classe: " + s2 + " ==> pourcentage de couplage (poids): " + classes.get(s2));
 
             }
 
         }
+
+    }
 
 
     public void buildGraphWithJGraphT() throws IOException {

@@ -70,7 +70,7 @@ public class MainG {
                     break;
                 }
                 case 2:{
-                    couplingGraph.createCouplingGraph(callGraph);
+                    couplingGraph.afficherCouplingGraph(couplingGraph.createCouplingGraph(callGraph));
                     couplingGraph.buildGraphWithJGraphT();
                     Thread.sleep(3000);
 
