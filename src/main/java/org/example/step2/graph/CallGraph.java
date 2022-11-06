@@ -1,11 +1,20 @@
 package org.example.step2.graph;
 
+import com.mxgraph.layout.mxCircleLayout;
+import com.mxgraph.layout.mxIGraphLayout;
+import com.mxgraph.util.mxCellRenderer;
 import org.eclipse.jdt.core.dom.*;
 import org.example.step2.parser.MyParser;
 import org.example.step2.visitor.*;
+import org.jgrapht.ext.JGraphXAdapter;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -165,5 +174,27 @@ public class CallGraph {
         return mapTheCallGraph;
 
 
+    }
+
+
+    public String buildGraphWithJGraphT() throws IOException {
+        JGraphXAdapter<String, DefaultEdge> graphAdapter = new JGraphXAdapter<String, DefaultEdge>(graphJGraphT);
+        mxIGraphLayout layout = new mxCircleLayout(graphAdapter);
+        layout.execute(graphAdapter.getDefaultParent());
+
+        BufferedImage image = mxCellRenderer.createBufferedImage(graphAdapter, null, 2, Color.WHITE, true, null);
+        File imgFile = new File("my_graph.png");
+        if (imgFile.exists())
+            imgFile.delete();
+
+        ImageIO.write(image, "PNG", imgFile);
+
+        if (!imgFile.exists()) {
+            System.err.println("Le fichier "+imgFile.getName()+" n'est pas cré !");
+        }
+        else {
+            System.out.println("Vous allez trouvez l'image correspondante a notre graphe d'appel à cet endroit:\n "+imgFile.getAbsolutePath()+"\n");
+        }
+        return imgFile.getAbsolutePath()+"\n";
     }
 }

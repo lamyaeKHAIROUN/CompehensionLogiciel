@@ -38,9 +38,10 @@ public class ClassDeclarationVisitor extends Visitor {
             Map<String, Integer> methodsCollection = new HashMap<>();
             Set<MethodDeclaration> methodList = new HashSet<>();
             for (MethodDeclaration methodDeclaration : node.getMethods()) {
-                methodsCollection.put(methodDeclaration.getName().getIdentifier(), countLines(methodDeclaration.getBody().toString()));
-                methodList.add(methodDeclaration);
-
+                if (methodDeclaration.getBody()!=null){
+                    methodsCollection.put(methodDeclaration.getName().getIdentifier(), countLines(methodDeclaration.getBody().toString()));
+                    methodList.add(methodDeclaration);
+                }
             }
             classeCollection.put(node, methodsCollection);
             classeMapMethods.put(node,methodList);

@@ -29,11 +29,6 @@ public class Processor {
     static  String  str=new String();
 	//long total = 0;
 	Set<MethodInvocation> mapInvocations;
-	//String classNameM2 = "";
-	//IMethodBinding binding;
-	//TypeDeclaration typeM1;
-	//ITypeBinding type;
-	//String classNameM1;
 	private String path;
 	private MyParser parser;
 	private ClassDeclarationVisitor classDeclarationVisitor;
