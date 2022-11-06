@@ -2,19 +2,16 @@ package org.example.step2.graph;
 
 import com.mxgraph.layout.mxCircleLayout;
 import com.mxgraph.layout.mxIGraphLayout;
-import com.mxgraph.util.mxCellRenderer;
+import com.mxgraph.swing.mxGraphComponent;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.example.step2.metric.MetricClass;
 import org.jgrapht.ext.JGraphXAdapter;
-import org.jgrapht.graph.DefaultDirectedGraph;
-import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.ListenableDirectedWeightedGraph;
 
-import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,8 +21,10 @@ import java.util.TreeMap;
 public class CouplingGraph {
 
     Map<String, Map<String, Float>> classCalls = new TreeMap<>();
-    private DefaultDirectedGraph<String, DefaultEdge> graphJGraphT= new DefaultDirectedGraph<>(DefaultEdge.class);
 
+    ListenableDirectedWeightedGraph<String, MyWeightedEdge> graphJGraphT= new ListenableDirectedWeightedGraph<String, MyWeightedEdge>(MyWeightedEdge.class);
+
+    //private SimpleWeightedGraph<String, DefaultWeightedEdge> graphJGraphT= new SimpleWeightedGraph<>(DefaultWeightedEdge.class);
     float couplage=0;
     public Map<String, Map<String, Float>> createCouplingGraph(CallGraph callGraph){
         Map<TypeDeclaration, Map<MethodDeclaration, Set<MethodInvocation>>> mapTheCallGraph = callGraph.getMapTheCallGraph();
@@ -48,8 +47,11 @@ public class CouplingGraph {
                         //si le couplage entre les deux classes est sup à 0, alors on ajoute cette classe dans la liste de classe appelées avec la valeur de couplage
                         classCalls.get(class1).put(class2,couplage);
                         graphJGraphT.addVertex(class2);
-                        graphJGraphT.addEdge(class1,class2);
-                       // graphJGraphT.setEdgeWeight(graphJGraphT.getEdge(class1,class2),(double) couplage);
+                        if(graphJGraphT.getEdge(class1,class2)==null){
+                            MyWeightedEdge e= graphJGraphT.addEdge(class1,class2);
+                             graphJGraphT.setEdgeWeight( e,(double) couplage);
+
+                        }
 
 
                     }
@@ -77,25 +79,21 @@ public class CouplingGraph {
         }
 
 
-    public String buildGraphWithJGraphT() throws IOException {
-        JGraphXAdapter<String, DefaultEdge> graphAdapter = new JGraphXAdapter<String, DefaultEdge>(graphJGraphT);
+    public void buildGraphWithJGraphT() throws IOException {
+        JFrame frame = new JFrame("Coupling graph");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setPreferredSize(new Dimension(500, 500));
+
+        JGraphXAdapter<String, MyWeightedEdge> graphAdapter = new JGraphXAdapter<String, MyWeightedEdge>(graphJGraphT);
         mxIGraphLayout layout = new mxCircleLayout(graphAdapter);
         layout.execute(graphAdapter.getDefaultParent());
 
-        BufferedImage image = mxCellRenderer.createBufferedImage(graphAdapter, null, 2, Color.WHITE, true, null);
-        File imgFile = new File("my_graph.png");
-        if (imgFile.exists())
-            imgFile.delete();
+        frame.add(new mxGraphComponent(graphAdapter));
 
-        ImageIO.write(image, "PNG", imgFile);
+        frame.pack();
+        frame.setLocationByPlatform(true);
+        frame.setVisible(true);
 
-        if (!imgFile.exists()) {
-            System.err.println("Le fichier "+imgFile.getName()+" n'est pas cré !");
-        }
-        else {
-            System.out.println("Vous allez trouvez l'image correspondante a notre graphe d'appel à cet endroit:\n "+imgFile.getAbsolutePath()+"\n");
-        }
-        return imgFile.getAbsolutePath()+"\n";
     }
 
 }

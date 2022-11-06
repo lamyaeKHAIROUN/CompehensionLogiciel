@@ -1,26 +1,18 @@
 package org.example.step2.processor;
 
-import com.mxgraph.layout.mxCircleLayout;
-import com.mxgraph.layout.mxIGraphLayout;
-import com.mxgraph.util.mxCellRenderer;
-import org.eclipse.jdt.core.dom.*;
-import org.example.step2.Main;
-import org.example.step2.graph.Graph;
-import org.example.step2.graph.Utility;
-import org.example.step2.graph.Vertex;
+import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.TypeDeclaration;
+import org.example.step2.graph.CallGraph;
 import org.example.step2.parser.MyParser;
 import org.example.step2.visitor.*;
-import org.jgrapht.ext.JGraphXAdapter;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.List;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
@@ -45,17 +37,6 @@ public class Processor {
 	private Map<MethodDeclaration, Map<MethodInvocation, Integer>> allInvocationsByMet =new HashMap<>();
 
 	private static int nbRelations=0;
-
-	public Graph<Vertex> getGraph() {
-		return graph;
-	}
-
-	public void setGraph(Graph<Vertex> graph) {
-		this.graph = graph;
-	}
-
-	Graph<Vertex> graph = new Graph<Vertex>();
-
 
 
 
@@ -181,18 +162,14 @@ public class Processor {
 			case 14: {
 				System.out.println("Vous allez trouvez l'image correspondante a notre graphe d'appel à cet endroit: ");
 				//callGraph();
-				graphData(parser.getParse());
-				buildGraphWithJGraphT();
+				CallGraph callGraph=new CallGraph();
+				callGraph.processGraph(parser.getParse());
+				callGraph.buildGraphWithJGraphT();
 				break;
 
 			}
 
-			case 15: {
-				graphData(parser.getParse());
-				//System.out.println("Nombre de relations: "+total);
-					//callGraph();
-					break;
-				}
+
 			default: {
 				System.err.println("Vous devez choisir un nombre parmis ceux qui sont propose dans le menu");
 				break;
@@ -705,10 +682,11 @@ public class Processor {
 	}
 	
 	public String btn14() throws IOException {
-		graphData(parser.getParse());
-		String s=buildGraphWithJGraphT();
-	
-		return  "Vous allez trouvez l'image correspondante a notre graphe d'appel à cet endroit:\n "+s;
+		//callGraph();
+		CallGraph callGraph=new CallGraph();
+		callGraph.processGraph(parser.getParse());
+		callGraph.buildGraphWithJGraphT();
+		return  "Vous allez trouvez l'image correspondante a notre graphe d'appel à cet endroit:\n "+callGraph.buildGraphWithJGraphT();
 
 	}
 
@@ -718,7 +696,7 @@ public class Processor {
 			sb.append("Aucun élément à afficher");
 		} else {
 			for (Entry<String, Integer> elt : set) {
-				sb.append(Main.indentationFormat + "" + elt +" \n");
+				sb.append( "" + elt +" \n");
 			}
 		}
 		return sb.toString();
@@ -730,220 +708,13 @@ public class Processor {
 			sb.append("Aucun élément à afficher");
 		} else {
 			for (String elt : list) {
-				sb.append(Main.indentationFormat + "" + elt);
+				sb.append( "" + elt);
 			}
 		}
 		return sb.toString();
 	}
 	
-	
-	
-	
-	  //graph
-    public Graph callGraph() throws IOException {
-        Graph<Vertex> g = new Graph<Vertex>();
-        Vertex source=new Vertex();
-        Vertex target=new Vertex();
-        List<String> filesContent = this.getJavaFiles();
-        ClassDeclarationVisitor visitor = new ClassDeclarationVisitor();
-        CompilationUnit parse;
-        for (String fileContent : filesContent) {
-            parse = parser.getCompilationUnit(fileContent);
-            parse.accept(visitor);
-
-            Map<TypeDeclaration, Set<MethodDeclaration>> classContent = new HashMap<>(visitor.getClasseMapMethods());
-            Set set = classContent.entrySet();
-
-            Iterator itr = set.iterator();
-            Set<MethodDeclaration> mapMethod = new HashSet<>();
-            while (itr.hasNext()) {
-                Entry mentry = (Entry) itr.next();
-                //la classe en question
-                TypeDeclaration typeDeclaration = (TypeDeclaration) mentry.getKey();
-                //get la liste de methodes
-                mapMethod = (Set<MethodDeclaration>) mentry.getValue();
 
 
-                for (MethodDeclaration method : mapMethod) {
-                	MethodIvocationVisitor visitor2 = new MethodIvocationVisitor();
-                    method.accept(visitor2);
-                    source = new Vertex(String.valueOf(method.getName()), String.valueOf(typeDeclaration.getName()));
-                    for (MethodInvocation methodInvocation : visitor2.getMethods()) {
-                       
-                    	String type=null;
-                        target = new Vertex(String.valueOf(methodInvocation.getName()), type);
-                        g.addEdge(source, target);
-
-                    }
-
-                }
-            }
-        }
-        System.out.println("\nGraph d'appel:\n"
-                +g.afficherGraph());
-
-        return g;
-    }
-
-
-	public static int getNbRelations() {
-		return nbRelations;
-	}
-
-	public Map<TypeDeclaration, Map<MethodDeclaration, Set<MethodInvocation>>> graphData(CompilationUnit cu) {
-		Vertex source=new Vertex();
-		Vertex target=new Vertex();
-		long total = 0;
-		Map<MethodInvocation, Integer> mapInvocations;
-		String classNameM2 = "";
-		IMethodBinding binding;
-		TypeDeclaration typeM1;
-		ITypeBinding type;
-		String classNameM1;
-
-
-
-
-        boolean isMethodNodeAdded;
-        ClassDeclarationVisitor visitorClass = new ClassDeclarationVisitor();
-        cu.accept(visitorClass);
-
-        for (TypeDeclaration nodeClass : visitorClass.getClasses()) {
-            MethodDeclarationVisitor visitorMethod = new MethodDeclarationVisitor();
-            nodeClass.accept(visitorMethod);
-
-            Map<MethodDeclaration, Set<MethodInvocation>> mapMethodDeclarationInvocation = new HashMap<>();
-            String caller;
-
-            for (MethodDeclaration nodeMethod : visitorMethod.getMethods()) {
-                nodeMethod.resolveBinding();
-                MethodIvocationVisitor visitorMethodInvocation = new MethodIvocationVisitor();
-                nodeMethod.accept(visitorMethodInvocation);
-                mapMethodDeclarationInvocation.put(nodeMethod,  visitorMethodInvocation.getMethods());
-				//remplir le graphe
-				graph.getInvocations().put(nodeMethod,visitorMethodInvocation.getMethods());
-				//nbRelations+=(visitorMethodInvocation.getMethods()).size();
-
-                caller = nodeClass.getName().toString()+"::"+nodeMethod.getName();
-
-                isMethodNodeAdded = false;
-
-                for (MethodInvocation methodInvocation :(Set<MethodInvocation>) visitorMethodInvocation.getMethods()) {
-
-//*****************************************************************************//
-
-				binding = methodInvocation.resolveMethodBinding();
-					System.out.println("bindin : "+binding);
-					System.out.println("inv : "+methodInvocation.getName());
-
-
-					if (binding != null) {
-					type = binding.getDeclaringClass();
-					if (type != null) {
-						classNameM2 = type.getQualifiedName();
-						System.out.println("declaring class: "+classNameM2);
-
-						typeM1 = (TypeDeclaration) nodeMethod.getParent();
-						classNameM1 = Utility.getClassFullyQualifiedName(typeM1);
-						//verifie si la classe de la methode invoqué est bien defferente de celle de la classe ou la méthode appelante est declaré
-						//ça vaurt dire que si une methode appelle une methode declaré dans la meme classe que elle alors
-						// on va pas inrémenter le nombre car on est en train de calculer les relation entre les classes
-						if (!classNameM2.equals(classNameM1)) {
-							total ++;
-							System.out.println("total courant "+total);
-							//System.out.println("total: "+total);
-						}
-					}
-				}
-
-//***********************************************************************************************//
-
-
-
-
-                    String callee;
-				       if (methodInvocation.getExpression() != null) {
-                        if (methodInvocation.getExpression().resolveTypeBinding() != null) {
-                            if (!isMethodNodeAdded) {
-                                graphJGraphT.addVertex(caller);
-								source=new Vertex(caller);
-
-								nbRelations++;
-
-								//g.addVertex(source,new ArrayList<String>());
-                                isMethodNodeAdded = true;
-                            }
-                            callee = methodInvocation.getExpression().resolveTypeBinding().getName()+"::"+methodInvocation.getName();
-                            graphJGraphT.addVertex(callee);
-							source=new Vertex(caller);
-							target=new Vertex(callee);
-						//	graph.addEdge(source.displayNode(),target.displayNode());
-							graphJGraphT.addEdge(caller, callee);
-
-                            setLink.add("\t\""+caller+"\"->\""+callee+"\"\n");
-                        }
-                    }
-                    else if (methodInvocation.resolveMethodBinding() != null) {
-                        if (!isMethodNodeAdded) {
-                            graphJGraphT.addVertex(caller);
-                            isMethodNodeAdded = true;
-
-						}
-                        callee = methodInvocation.resolveMethodBinding().getDeclaringClass().getName()+"::"+methodInvocation.getName();
-                        graphJGraphT.addVertex(callee);
-                        graphJGraphT.addEdge(caller, callee);
-					//	graph.addEdge(source.displayNode(),target.displayNode());
-
-                        setLink.add("\t\""+caller+"\"->\""+callee+"\"\n");
-                    }
-                    else {
-                        if (!isMethodNodeAdded) {
-                            graphJGraphT.addVertex(caller);
-                            isMethodNodeAdded = true;
-
-						}
-                        callee = nodeClass.getName()+"::"+methodInvocation.getName();
-                        graphJGraphT.addVertex(callee);
-                        graphJGraphT.addEdge(caller, callee);
-						//graph.addEdge(source.displayNode(),target.displayNode());
-
-                        setLink.add("\t\""+caller+"\"->\""+callee+"\"\n");
-                    }
-                }
-            }
-			System.out.println("heeere");
-
-            mapTheCallGraph.put(nodeClass, mapMethodDeclarationInvocation);
-			//graph.getClassDataMap().put(nodeClass,mapMethodDeclarationInvocation);
-        }
-
-		graph.afficherGraph();
-		System.out.println("nbRel: "+nbRelations);
-		System.out.println("totaaaaaaaaal: "+total);
-
-		return mapTheCallGraph;
- 
-
-}
-    public String buildGraphWithJGraphT() throws IOException {
-        JGraphXAdapter<String, DefaultEdge> graphAdapter = new JGraphXAdapter<String, DefaultEdge>(graphJGraphT);
-        mxIGraphLayout layout = new mxCircleLayout(graphAdapter);
-        layout.execute(graphAdapter.getDefaultParent());
-
-        BufferedImage image = mxCellRenderer.createBufferedImage(graphAdapter, null, 2, Color.WHITE, true, null);
-        File imgFile = new File("my_graph.png");
-        if (imgFile.exists())
-            imgFile.delete();
-
-        ImageIO.write(image, "PNG", imgFile);
-
-        if (!imgFile.exists()) {
-            System.err.println("Le fichier "+imgFile.getName()+" n'est pas cré !");
-        }
-        else {
-            System.out.println("Vous allez trouvez l'image correspondante a notre graphe d'appel à cet endroit:\n "+imgFile.getAbsolutePath()+"\n");
-        }
-        return imgFile.getAbsolutePath()+"\n";
-    }
 }
 	 

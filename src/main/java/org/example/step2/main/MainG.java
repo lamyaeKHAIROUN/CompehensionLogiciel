@@ -1,5 +1,7 @@
-package org.example.step2.graph;
+package org.example.step2.main;
 
+import org.example.step2.graph.CallGraph;
+import org.example.step2.graph.CouplingGraph;
 import org.example.step2.metric.MetricClass;
 import org.example.step2.processor.Processor;
 
@@ -50,7 +52,12 @@ public class MainG {
 
             choix = sc.nextInt();
             switch (choix){
-
+                case 0:{
+                    System.out.println("A dios!Pour revenir au menu, relancer le prog");
+                    sc.close();
+                    System.exit(0);
+                    break;
+                }
                 case 1: {
                     Scanner scaner = new Scanner(System.in);
                     System.out.println("Inserez le nom de la première classe ");
@@ -69,6 +76,11 @@ public class MainG {
 
                     break;
 
+                }
+
+                default: {
+                    System.err.println("Vous devez choisir un nombre parmis ceux qui sont propose dans le menu");
+                    break;
                 }
             }
 

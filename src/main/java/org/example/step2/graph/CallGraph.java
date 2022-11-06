@@ -57,8 +57,6 @@ public class CallGraph {
 
 
     public Map<TypeDeclaration, Map<MethodDeclaration, Set<MethodInvocation>>> processGraph(CompilationUnit cu) {
-        Vertex source=new Vertex();
-        Vertex target=new Vertex();
         long total = 0;
         Map<MethodInvocation, Integer> mapInvocations;
       /*  String classNameM2 = "";
@@ -93,35 +91,6 @@ public class CallGraph {
                 allInvocationsByMet.put(nodeMethod,visitorMethodInvocation.getMethods());
 
                 for (MethodInvocation methodInvocation : visitorMethodInvocation.getMethods()) {
-
-//*****************************************************************************//
-
-                 /*   binding = methodInvocation.resolveMethodBinding();
-                    System.out.println("bindin : "+binding);
-                    System.out.println("inv : "+methodInvocation.getName());
-
-
-                    if (binding != null) {
-                        type = binding.getDeclaringClass();
-                        if (type != null) {
-                            classNameM2 = type.getQualifiedName();
-                            System.out.println("declaring class: "+classNameM2);
-
-                            typeM1 = (TypeDeclaration) nodeMethod.getParent();
-                            classNameM1 = Utility.getClassFullyQualifiedName(typeM1);
-                            //verifie si la classe de la methode invoqué est bien defferente de celle de la classe ou la méthode appelante est declaré
-                            //ça vaurt dire que si une methode appelle une methode declaré dans la meme classe que elle alors
-                            // on va pas inrémenter le nombre car on est en train de calculer les relation entre les classes
-                            if (!classNameM2.equals(classNameM1)) {
-                                total ++;
-                                System.out.println("total courant "+total);
-                                //System.out.println("total: "+total);
-                            }
-                        }
-                    }*/
-
-//***********************************************************************************************//
-
 
                     String methodApplee;
                     if (methodInvocation.getExpression() != null) {
